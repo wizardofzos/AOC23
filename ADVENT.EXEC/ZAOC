@@ -22,6 +22,7 @@ Address ISPExec
   exec = "'"exec"'"
   panels = "'"hlq".PANELS'"
   config = "'"hlq".CONFIG'"
+  solutions = "'"hlq".SOLVE.REXX" /* No closing ' so we can add (*/
 
   if zapplid /= 'ZAOC' then do
     if panels /= null then
@@ -54,7 +55,6 @@ Address ISPExec
       "TBCreate zaocmain",
         "Names(year day part status)",
         "Library(isptabl) Write Share"
-
       "TBAdd zaocmain"
       "TBSAVE zaocmain REPLCOPY LIBRARY(isptabl)"
     end
@@ -82,6 +82,16 @@ Address ISPExec
       When abbrev('ADD',zcmd,2) = 1 then call Add_puzzle
       Otherwise nop
     End
+    ys = substr(year,3,2)
+    rx = solutions"(Y"ys"D"day"P"part")'"
+    if zsel = 'E' then do
+      'Edit dataset('rx')'
+    end
+    if zsel = 'R' then do
+      Address TSO
+      "EX "rx
+      Address ISPExec
+    end
   end
 
   'TBCLOSE zaocmain'
@@ -96,7 +106,6 @@ Add_puzzle:
   /* Now we need to go out to adventofcode.com
   and get the puzzle for this day.. and the
   input file....                       */
-  say session
   cmd = curlpath
   y = yyyy
   d = dd
@@ -105,7 +114,6 @@ Add_puzzle:
   cmd = cmd "-H 'Cookie: session="session";' -k > "inputfiles"/y"y"d"d
   x = bpxwunix(cmd,,so.,se.)
   if x = 0 then do
-
     year = yyyy
     day  = dd
     status = "Input file downloaded to "inputfiles"/y"y"d"d
@@ -117,6 +125,27 @@ Add_puzzle:
     'tbadd zaocmain'
     "TBSAVE zaocmain REPLCOPY LIBRARY(isptabl)"
   end
+  /* create template solution */
+  Address TSO
+  ddname1 = "ZAOC#RX1"
+  ddname2 = "ZAOC#RX2"
+  ys = substr(y,3,2)
+  s.1 = "/*--------------------------------------------[REXX]"
+  s.2 = "| Made with ZAOC by wizard@zdevops.com             |"
+  s.3 = "+-------------------------------------------------*/"
+  s.4 = 'say "Advent of Code' year 'day' day'"'
+  s.5 = "x = bpxwunix('cat "inputfiles"/y"y"d"d"',,file.,se.)"
+  s.6 = "do i = 1 to file.0"
+  s.7 = "  say file.i"
+  s.8 = "end"
+  s.0 = 8
+  "Alloc f("ddname1") shr reuse ds("solutions"(Y"ys"d"d"p1)')"
+  'Execio * diskw' ddname1 '(finis stem s.'
+  'Free  f('ddname1')'
+  "Alloc f("ddname2") shr reuse ds("solutions"(Y"ys"d"d"p2)')"
+  'Execio * diskw' ddname2 '(finis stem s.'
+  'Free  f('ddname2')'
+  Address ISPExec
   return
 
 read_config: procedure,
