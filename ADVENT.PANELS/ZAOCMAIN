@@ -8,7 +8,7 @@
 %Command ===>_zcmd       \ \ %Scroll ===>_zscr+
 +
 +
-+
++         Type ADD on the command line to add a year/day
 +
 +
 +
@@ -18,13 +18,8 @@
 )Model
 _z+  $z   +$z +$z+  $z
 )Init
- &clone  = 'Clone'
- &create = 'Create'
- &ssh    = 'SSH'
- &config = 'Config'
  &zscr = CSR
  .zvars = '(zsel year day part status)'
- .help = zigihp0
 )Proc
  &row = &z
  if (&ZCMD = &Z)
@@ -39,10 +34,5 @@ _z+  $z   +$z +$z+  $z
        if (&Zsel = '=')
            &Zsel = &osel
      &osel = &zsel
- ver (&zsel,list,S,D,V)
-)PNTS
- FIELD(CLONE   ) VAR(ZCMD) VAL('CLONE')
- FIELD(CREATE  ) VAR(ZCMD) VAL('CREATE')
- FIELD(SSH     ) VAR(ZCMD) VAL('SSH')
- FIELD(CONFIG  ) VAR(ZCMD) VAL('CONFIG')
+ ver (&zsel,list,E,R)
 )end
