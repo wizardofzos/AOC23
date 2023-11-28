@@ -1,0 +1,142 @@
+/* REXX */
+Address ISPExec
+
+  'vget (zapplid)'
+  /*
+  "Control Errors Return"
+  */
+  parse value '' with null
+  /* ----------------------------------------------------- *
+  | Initialise the application named THISAPP              |
+  * ----------------------------------------------------- */
+  parse source x1 x2 x3 x4 exec .
+  if exec = '?' then do
+    x = listdsi(x4 'FILE')
+    exec = sysdsname
+  end
+
+  hlq = translate(exec,' ','.')
+  hlq = subword(hlq,1,words(hlq)-1)
+  hlq = translate(hlq,'.',' ')
+
+  exec = "'"exec"'"
+  panels = "'"hlq".PANELS'"
+  config = "'"hlq".CONFIG'"
+
+  if zapplid /= 'ZAOC' then do
+    if panels /= null then
+    'libdef ispplib dataset id('panels') stack'
+    if exec /= null then
+    Address TSO 'altlib act application(exec) dataset('exec')'
+  end
+
+  if zapplid <> 'ZAOC' then do
+    "Select CMD(%zaoc) Newappl(ZAOC) Passlib"
+    if panels /= null then
+    'libdef ispplib'
+    if exec /= null then
+    Address TSO 'altlib deact application(exec)'
+    exit 0
+  end
+
+  /* read config */
+  curlpath = ''
+  session = ''
+  inputfiles = ''
+  call read_config
+  /* Now we start our main panel. */
+
+
+  'TBOpen zaocmain Library(isptabl) Write Share'
+  if rc > 0 then do
+    if rc = 8 then do
+      /* Create table, always add current year, day01*/
+      "TBCreate zaocmain",
+        "Names(year day part status)",
+        "Library(isptabl) Write Share"
+
+      "TBAdd zaocmain"
+      "TBSAVE zaocmain REPLCOPY LIBRARY(isptabl)"
+    end
+  end
+  zcmd = null
+
+  year_top = 0
+  'tbtop zaocmain'
+  do forever
+    parse value '' with zsel zcmd row
+    'TBTop zaocmain'
+    'tbskip zaocmain number('year_top')'
+    'tbdispl zaocmain panel(zaocmain)'
+
+    if rc > 4 then leave
+
+    repo_top = ztdtop
+    if row = 0 then zsel = null
+    if row <> null then
+    if row > 0 then do
+      'TBTop zaocmain'
+      'TBSkip zaocmain Number('row')'
+    end
+    Select
+      When abbrev('ADD',zcmd,2) = 1 then call Add_puzzle
+      Otherwise nop
+    End
+  end
+
+  'TBCLOSE zaocmain'
+
+  Exit 0
+
+Add_puzzle:
+
+  'Addpop row(4) column(12)'
+  'Display Panel(addpuzz)'
+  'Rempop'
+  /* Now we need to go out to adventofcode.com
+  and get the puzzle for this day.. and the
+  input file....                       */
+  say session
+  cmd = curlpath
+  y = yyyy
+  d = dd
+  cmd = cmd "'https://adventofcode.com/"y"/day/"d"/input'"
+  cmd = cmd "-H 'Accept: text/html'"
+  cmd = cmd "-H 'Cookie: session="session";' -k > "inputfiles"/y"y"d"d
+  x = bpxwunix(cmd,,so.,se.)
+  if x = 0 then do
+
+    year = yyyy
+    day  = dd
+    status = "Input file downloaded to "inputfiles"/y"y"d"d
+    part   = 1
+    'tbadd zaocmain'
+    "TBSAVE zaocmain REPLCOPY LIBRARY(isptabl)"
+
+    part   = 2
+    'tbadd zaocmain'
+    "TBSAVE zaocmain REPLCOPY LIBRARY(isptabl)"
+  end
+  return
+
+read_config: procedure,
+ expose config curlpath session inputfiles
+ parse var config
+ Address TSO
+ "Alloc f("ddname") shr reuse ds("config")"
+ 'Execio * diskr' ddname '(finis stem cfg.'
+ 'Free  f('ddname')'
+ Address ISPExec
+ do i = 1 to cfg.0
+   if left(cfg.i,1) = '*' then iterate
+   Select
+     When translate(word(cfg.i,1)) = 'CURL_PATH' then
+          curlpath  = word(cfg.i,3)
+     When translate(word(cfg.i,1)) = 'SESSION' then
+          session  = word(cfg.i,3)
+     When translate(word(cfg.i,1)) = 'INPUTFILES' then
+          inputfiles  = word(cfg.i,3)
+     Otherwise nop
+   End
+ end
+ return

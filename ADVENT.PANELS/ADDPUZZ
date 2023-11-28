@@ -1,0 +1,12 @@
+)Attr
+ $ type(output) caps(off)
+ ! type(input)
+)Body Window(62,4)
++
+Type year and day, press enter :)
+  +Year Day : !yyyy!dd+
+
+)Init
+ &zwinttl = 'Add A Puzzle'
+)Proc
+)end
