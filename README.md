@@ -13,3 +13,8 @@ A little ISPF helper tool for when you are solving Advent of Code with REXX.
 Rename the ADVENT.CONFIG.EXAMPLE and change the values to match your systems setup and your session-cookie 
 
     
+## Cloning?
+This repo is not really ready for clonage as usage :)
+Yes you can clone and use yourself.. but please work from the 'starthere' branch.
+If you clone master, with all my solutions and you 'ADD' you data... my solutions will be overwritten I think. 
+I haven't tested it.
