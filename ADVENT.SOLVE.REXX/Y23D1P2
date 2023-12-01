@@ -1,0 +1,76 @@
+/*--------------------------------------------[REXX]
+| Made with ZAOC by wizard@zdevops.com             |
++-------------------------------------------------*/
+say "Advent of Code 2023 day 1"
+x = bpxwunix('cat /prj/aoc23/y2023d1',,file.,se.)
+
+p1 = 0
+
+/* Concatenates first and last digit of string.
+   if only one digit it's both first and last ;)
+
+   a -> first digit
+   b -> last digit (or zero is only one digit in string)
+
+   But also check for 'words of numbers'
+*/
+
+do i = 1 to file.0
+  first = 0
+  a = 0
+  b = 0
+  nmr = ''
+  file.i = strreplace(file.i,'twone','21')
+  file.i = strreplace(file.i,'fiveight','58')
+  file.i = strreplace(file.i,'sevenine','79')
+  file.i = strreplace(file.i,'threeight','38')
+  file.i = strreplace(file.i,'oneight','18')
+  file.i = strreplace(file.i,'eightwo','82')
+  file.i = strreplace(file.i,'eighthree','83')
+  file.i = strreplace(file.i,'one','1')
+  file.i = strreplace(file.i,'two','2')
+  file.i = strreplace(file.i,'three','3')
+  file.i = strreplace(file.i,'four','4')
+  file.i = strreplace(file.i,'five','5')
+  file.i = strreplace(file.i,'six','6')
+  file.i = strreplace(file.i,'seven','7')
+  file.i = strreplace(file.i,'eight','8')
+  file.i = strreplace(file.i,'nine','9')
+  l = length(file.i)
+  do j = 1 to l
+    c = substr(file.i,j,1)
+    if datatype(c) = 'NUM' then do
+      if first = 0 then do
+        a = c
+        first = 1
+      end
+      else
+        b = c
+    end
+  end
+  if b > 0 then nmr = a || b
+  else nmr = a || a
+  p1 = p1 + nmr
+end
+
+say "Solution part 2:"p1
+
+exit
+
+strreplace:
+ORIGINAL = ARG(1)
+OLDTXT = ARG(2)
+NEWTXT = ARG(3)
+/* YOU CAN CHANGE THE BELOW KEY (TMPTXT), WHICH IS USED AS A TEMPORARY
+POINTER TO IDENTIFY THE TEXT TO BE REPLACED */
+TMPTXT = '6A53CD2EW1F'
+NEWSTR = ORIGINAL
+DO WHILE POS(OLDTXT,NEWSTR) > 0
+NEWSTR = SUBSTR(NEWSTR, 1 , POS(OLDTXT,NEWSTR)-1) ||,
+TMPTXT || SUBSTR(NEWSTR, POS(OLDTXT,NEWSTR) + LENGTH(OLDTXT))
+END
+DO WHILE POS(TMPTXT,NEWSTR) > 0
+NEWSTR = SUBSTR(NEWSTR, 1 , POS(TMPTXT,NEWSTR)-1) ||,
+NEWTXT || SUBSTR(NEWSTR, POS(TMPTXT,NEWSTR) + LENGTH(TMPTXT))
+END
+RETURN NEWSTR
