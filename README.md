@@ -1,6 +1,9 @@
 # ZAOC
 
 A little ISPF helper tool for when you are solving Advent of Code with REXX.
+Also has my solutions in ADVENT.SOLVE.REXX.
+
+If you wanna clone/use this see notes below
 
 ## Features
 
@@ -12,6 +15,10 @@ A little ISPF helper tool for when you are solving Advent of Code with REXX.
 
 Rename the ADVENT.CONFIG.EXAMPLE and change the values to match your systems setup and your session-cookie 
 
+## TODO
+
+- Fire the solution to AoC
+- Update the table to show how many tries on a day/part
     
 ## Cloning?
 This repo is not really ready for clonage as usage :)
