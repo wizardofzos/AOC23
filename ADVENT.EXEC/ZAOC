@@ -93,7 +93,7 @@ Address ISPExec
       Address ISPExec
       if POS("Input file",status) = 1
       then status = "1 try"
-      else do
+      else if POS("Solved after",status) = 0 then do
         count = word(status,1)
         count = count + 1
         status = count" tries"
@@ -192,3 +192,15 @@ read_config: procedure,
    End
  end
  return
+
+
+/* To add for Completion Post/Check
+
+curl 'https://adventofcode.com/2015/day/1/answer'
+     -X POST
+     -H 'Accept: text/html
+     -H 'Content-Type: application/x-www-form-urlencoded'
+     -H 'Cookie: session=555...
+     --data-raw 'level=1&answer=<answer>'
+
+*/
