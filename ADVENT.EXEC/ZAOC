@@ -91,6 +91,29 @@ Address ISPExec
       Address TSO
       "EX "rx
       Address ISPExec
+      if POS("Input file",status) = 1
+      then status = "1 try"
+      else if POS("Solved after",status) = 0 then do
+        count = word(status,1)
+        count = count + 1
+        status = count" tries"
+      end
+      "TBPUT zaocmain"
+      "TBSAVE zaocmain REPLCOPY LIBRARY(isptabl)"
+    end
+    if zsel = 'S' then do
+      status = word(status,1)
+      if status = 1
+      then extra = 'try'
+      else extra = 'tries'
+      status = "Solved after" status extra "at" time() "on" date()
+      "TBPUT zaocmain"
+      "TBSAVE zaocmain REPLCOPY LIBRARY(isptabl)"
+    end
+    if zsel = 'D' then do
+      status = 'Tried'
+      "TBDELETE zaocmain"
+      "TBSAVE zaocmain REPLCOPY LIBRARY(isptabl)"
     end
   end
 
@@ -169,3 +192,15 @@ read_config: procedure,
    End
  end
  return
+
+
+/* To add for Completion Post/Check
+
+curl 'https://adventofcode.com/2015/day/1/answer'
+     -X POST
+     -H 'Accept: text/html
+     -H 'Content-Type: application/x-www-form-urlencoded'
+     -H 'Cookie: session=555...
+     --data-raw 'level=1&answer=<answer>'
+
+*/
