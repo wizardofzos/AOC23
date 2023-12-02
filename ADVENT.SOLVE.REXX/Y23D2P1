@@ -1,0 +1,61 @@
+/*--------------------------------------------[REXX]
+| Made with ZAOC by wizard@zdevops.com             |
++-------------------------------------------------*/
+say "Advent of Code 2023 day 2"
+x = bpxwunix('cat /prj/aoc23/y2023d2',,file.,se.)
+
+/* loadout of bag */
+red = 12
+green = 13
+blue = 14
+/*                */
+
+possibilities = 0
+
+do i = 1 to file.0
+  file.i = translate(file.i,'_', ' ')
+  /* A line of game-data looks like this
+     Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+  */
+  parse var file.i "Game_"game":" rest
+  /* Now we have the game id in 'game' and 'rest' is:
+     ' 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green'
+  */
+  ispossible = 1                   /* everything is possible */
+  rest = translate(rest,' ',';')
+  /* We've now transformed/translated 'rest' into:
+  '_3_blue,_4_red _1_red,_2_green,_6_blue _2_green'
+  */
+  do set = 1 to words(rest)
+    /* So we can iterate trough the 'words' of that sentence
+    The 1st word is '_3_blue,_4_red' but....
+    */
+    cubedata = translate(word(rest,set),' ',',')
+    /* We turn that into '_3_blue _4_red' so we can  */
+    cubes = words(cubedata)
+    do cube = 1 to cubes
+      /* iterate trough those words */
+      cd =word(cubedata,cube)
+      parse var cd  "_"amount"_"color
+      /* get the amount and the color so we can do our thing */
+      if color = 'red' & amount > red then do
+        ispossible = 0
+        say "too many reds"
+        leave               /* we can leave more ? */
+      end
+      if color = 'green' & amount > green then do
+        ispossible = 0
+        say "too many greens"
+        leave               /* we can leave more ? */
+      end
+      if color = 'blue' & amount > blue then do
+        ispossible = 0
+        leave               /* we can leave more ? */
+      end
+    end
+  end
+  if ispossible = 1
+  then possibilities = possibilities + game
+end
+
+say "Part one: "possibilities
