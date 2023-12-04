@@ -42,9 +42,18 @@ do i = 1 to file.0
 
   do p = 1 to points
     ccard = card + p
+    /* This code was suboptimal....
+       There's no need to loop over copiesof.card and add one
+       We can just add the copies of the original card to this one..
+
     do copies = 1 to copiesof.card
       copiesof.ccard = copiesof.ccard + 1
     end
+
+       Speed increase : soooo much :)
+
+    */
+    copiesof.ccard = copiesof.ccard + copiesof.card
   end
 end
 
