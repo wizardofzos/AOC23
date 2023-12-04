@@ -15,13 +15,7 @@ file.6 = 'Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11'
 file.0 = 6
 */
 
-NUMERIC DIGITS 11
-
-
 copiesof. = 1
-totalcards = 0
-
-
 total = 0
 
 do i = 1 to file.0
@@ -38,7 +32,6 @@ do i = 1 to file.0
       points = points + 1
     end
   end
-
 
   do p = 1 to points
     ccard = card + p
@@ -57,10 +50,8 @@ do i = 1 to file.0
   end
 end
 
-
 do i = 1 to copiesof.0
   total = total + copiesof.i
 end
-
 
 say "Part Two: "total
