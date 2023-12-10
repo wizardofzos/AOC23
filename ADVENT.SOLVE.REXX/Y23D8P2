@@ -4,7 +4,9 @@
 say "Advent of Code 2023 day 8"
 x = bpxwunix('cat /prj/aoc23/y2023d8',,file.,se.)
 
-numeric digits 31
+numeric digits 16
+
+/* run in batch or EC6's ol */
 
 /* example data */
 aile.1 = 'LR'
@@ -77,42 +79,35 @@ do while(found=0)
     end
 end
 
+
+
 /* now we have the cycles in which all the positions hit
-   the Z at the end. Time to find the Least Common Multiple
-*/
+   the Z at the end. Time to find i for when they all hit
+   this is most effective highest, lowest... so sort the gos. */
 
-say "Need LCM for:"
+gosstr = ''
 do i = 1 to gos.0
-  say gos.i
-end                       /* can't fix this yet, or runs too long */
-
-exit
-do i = 3 to gos.0
-  p2 = lcm(p2,gos.i)
+  gosstr = gosstr gos.i'\n'
 end
-say "Part2: "p2
-exit
 
-p2 = 0
-mults. = ''
-do j= 2716700 to 27167340
-  if j // 1000= 0 then say TIME() ":" j
-  if p2 > 0 then leave
-  do i = 1 to gos.0
-    mult = gos.i * j
-    mults.i = mults.i mult
-    inall = 0
-    do k = 1 to gos.0
-      if k = i then iterate
-      if wordpos(mult,mults.k) > 0 then inall = inall + 1
-    end
-    if inall = gos.0 -1 then do
-      say "answer:" mult
-      p2 = mult
-      leave
-    end
-  end
+scmd = 'echo "'gosstr'" | sort   '
+x = bpxwunix(scmd,,so.,se.)
+sstr = ''
+do i = 2 to so.0
+  p = i - 1
+  say i '->'so.i'<'
+  gos.p = strip(so.i)
 end
+
+l = mylcm(gos.1,gos.2)
+say gos.1 gos.2 "->" l
+do i = gos.0 to 3 by -1
+  say l gos.i '->'
+  l = mylcm(l,gos.i)
+  say l
+end
+
+say "P2=" l
 
 
 
@@ -144,6 +139,38 @@ dfs: procedure expose nodes. route.
     step = step + 1
     return dfs(start,finish,step)
   end
+
+mylcm: procedure
+  parse arg a,b
+
+  lowest = min(a,b)
+  highest = max(a,b)
+
+  /* always increase by this amount */
+  l = lowest
+  h = highest
+  done = 0
+
+  do forever
+    if lowest < highest then do
+      lowest = lowest + l
+    end
+
+    if highest = lowest then do
+      return lowest
+    end
+
+    if lowest > highest then do
+      say TIME() "swap" highest "and" lowest
+      oldhi = highest
+      oldhiplus = h
+      h = l
+      highest = lowest
+      lowest = oldhi
+      l = oldhiplus
+    end
+  end
+
 
 lcm: procedure
   parse arg a,b
