@@ -62,6 +62,7 @@ Address ISPExec
   zcmd = null
 
   year_top = 0
+  'tbsort zaocmain fields(year,n,a,day,n,a)'
   'tbtop zaocmain'
   do forever
     parse value '' with zsel zcmd row
@@ -80,6 +81,9 @@ Address ISPExec
     end
     Select
       When abbrev('ADD',zcmd,2) = 1 then call Add_puzzle
+      When abbrev('SOR',zcmd,2) = 1 then do
+        'tbsort zaocmain fields(year,n,a,day,n,a)'
+      end
       Otherwise nop
     End
     ys = substr(year,3,2)
@@ -92,23 +96,37 @@ Address ISPExec
       "EX "rx
       Address ISPExec
       if POS("Input file",status) = 1
-      then status = "1 try"
-      else if POS("Solved after",status) = 0 then do
-        count = word(status,1)
+      then do
+        parse var status "Input file downloaded at" t "on" d
+        t = strip(t)
+        d = strip(d)
+        status = "1 at" TIME() "on" DATE("E") "start at" t "on" d
+      end
+      else if POS("Solved in",status) = 0 then do
+        parse var status count "at" t1 "on" d1 "start at" t "on" d
+        t = strip(t)
+        d = strip(d)
         count = count + 1
-        status = count" tries"
+        t1 = strip(TIME())
+        d1 = strip(DATE("E"))
+        status = count "at" t1 "on" d1 "start at" t "on" d
       end
       "TBPUT zaocmain"
       "TBSAVE zaocmain REPLCOPY LIBRARY(isptabl)"
     end
     if zsel = 'S' then do
-      status = word(status,1)
-      if status = 1
-      then extra = 'try'
-      else extra = 'tries'
-      status = "Solved after" status extra "at" time() "on" date()
-      "TBPUT zaocmain"
-      "TBSAVE zaocmain REPLCOPY LIBRARY(isptabl)"
+      if POS('start at',status) > 0 then do
+        parse var status count "at" t1 "on" d1 "start at" t "on" d
+        t = strip(t)
+        d = strip(d)
+        if count > 1
+        then tries = "tries"
+        else tries = "try"
+        status = "Solved in" strip(count) tries
+        status = status d"@"t" > "strip(DATE("E"))"@"strip(TIME())
+        "TBPUT zaocmain"
+        "TBSAVE zaocmain REPLCOPY LIBRARY(isptabl)"
+      end
     end
     if zsel = 'D' then do
       status = 'Tried'
@@ -139,7 +157,7 @@ Add_puzzle:
   if x = 0 then do
     year = yyyy
     day  = dd
-    status = "Input file downloaded to "inputfiles"/y"y"d"d
+    status = "Input file downloaded at" TIME() "on" DATE("E")
     part   = 1
     'tbadd zaocmain'
     "TBSAVE zaocmain REPLCOPY LIBRARY(isptabl)"
