@@ -1,0 +1,8 @@
+/*--------------------------------------------[REXX]
+| Made with ZAOC by wizard@zdevops.com             |
++-------------------------------------------------*/
+say "Advent of Code 2023 day 17"
+x = bpxwunix('cat /prj/aoc23/y2023d17',,file.,se.)
+do i = 1 to file.0
+  say file.i
+end
